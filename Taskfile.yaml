@@ -1,0 +1,9 @@
+version: "3"
+
+tasks:
+  generate:
+    aliases:
+      - run
+    desc: "Generate grpc proto file"
+    cmds:
+      - air

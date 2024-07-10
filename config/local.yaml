@@ -1,6 +1,6 @@
-env: "local" # dev, prod
+env: "development"
 
-storage_path: ""
+storage_path: "./config/local.yaml"
 token_ttl: 1h
 grpc:
   port: 44044
