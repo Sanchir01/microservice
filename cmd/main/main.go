@@ -16,8 +16,8 @@ var (
 func main() {
 	cfg := config.MustLoad()
 	fmt.Println(cfg)
-	lg := setupLogger("development")
-	slog.Error("test logger", lg)
+	lg := setupLogger(cfg.Env)
+	lg.Warn("test logger", lg)
 
 }
 func setupLogger(env string) *slog.Logger {
