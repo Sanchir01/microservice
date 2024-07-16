@@ -7,3 +7,9 @@ tasks:
     desc: "Generate grpc proto file"
     cmds:
       - air
+  running:
+    aliases:
+      - go
+    desc: "Starting for default go build"
+    cmds:
+      - go build

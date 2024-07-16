@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/Sanchir01/microservice/internal/app"
 	"github.com/Sanchir01/microservice/internal/config"
 	"github.com/Sanchir01/microservice/pkg/lib/logger/handlers/slogpretty"
 	"log/slog"
@@ -17,8 +18,10 @@ func main() {
 	cfg := config.MustLoad()
 	fmt.Println(cfg)
 	lg := setupLogger(cfg.Env)
-	lg.Warn("test logger", lg)
 
+	application := app.NewAppSrv(lg, cfg.GRPC.Port, cfg.StoragePath)
+
+	application.GrpcSrv.MustRun()
 }
 func setupLogger(env string) *slog.Logger {
 	var lg *slog.Logger
