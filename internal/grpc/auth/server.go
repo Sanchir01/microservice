@@ -16,7 +16,9 @@ func Register(gRPC *grpc.Server) {
 }
 
 func (s *serverAPI) Login(ctx context.Context, req *sandjmav1.LoginRequest) (*sandjmav1.LoginResponse, error) {
-	panic("implement me")
+	return &sandjmav1.LoginResponse{
+		UserUuid: "test",
+	}, nil
 }
 
 func (s *serverAPI) Register(ctx context.Context, req *sandjmav1.RegisterRequest) (*sandjmav1.RegisterResponse, error) {
