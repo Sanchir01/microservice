@@ -7,6 +7,8 @@ import (
 	"github.com/Sanchir01/microservice/pkg/lib/logger/handlers/slogpretty"
 	"log/slog"
 	"os"
+	"os/signal"
+	"syscall"
 )
 
 var (
@@ -21,7 +23,15 @@ func main() {
 
 	application := app.NewAppSrv(lg, cfg.GRPC.Port, cfg.StoragePath)
 
-	application.GrpcSrv.MustRun()
+	go application.GrpcSrv.MustRun()
+
+	stop := make(chan os.Signal, 1)
+	signal.Notify(stop, os.Interrupt, syscall.SIGTERM, syscall.SIGINT)
+	sign := <-stop
+
+	lg.Info("stoppping application", slog.String("signal", sign.String()))
+
+	application.GrpcSrv.Stop()
 }
 func setupLogger(env string) *slog.Logger {
 	var lg *slog.Logger
