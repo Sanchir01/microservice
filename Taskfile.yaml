@@ -16,7 +16,6 @@ tasks:
       - go
     desc: "Build and run the Go project"
     deps:
-
       - |
        chmod +x ./.bin/main
        build

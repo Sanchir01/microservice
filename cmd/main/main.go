@@ -26,7 +26,9 @@ func main() {
 	go application.GrpcSrv.MustRun()
 
 	stop := make(chan os.Signal, 1)
+
 	signal.Notify(stop, os.Interrupt, syscall.SIGTERM, syscall.SIGINT)
+
 	sign := <-stop
 
 	lg.Info("stoppping application", slog.String("signal", sign.String()))
