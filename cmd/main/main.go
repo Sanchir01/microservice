@@ -18,12 +18,14 @@ var (
 
 func main() {
 	cfg := config.MustLoad()
+
 	fmt.Println(cfg)
+
 	lg := setupLogger(cfg.Env)
 
 	application := app.NewAppSrv(lg, cfg.GRPC.Port, cfg.StoragePath)
 
-	go application.GrpcSrv.MustRun()
+	go func() { application.GrpcSrv.MustRun() }()
 
 	stop := make(chan os.Signal, 1)
 
@@ -35,6 +37,7 @@ func main() {
 
 	application.GrpcSrv.Stop()
 }
+
 func setupLogger(env string) *slog.Logger {
 	var lg *slog.Logger
 	switch env {

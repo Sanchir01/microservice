@@ -30,6 +30,7 @@ func (s *serverAPI) Login(ctx context.Context, req *sandjmav1.LoginRequest) (*sa
 		return nil, err
 	}
 	token, err := s.auth.Login(ctx, req.Password, req.Phone)
+
 	if err != nil {
 		return nil, err
 	}
