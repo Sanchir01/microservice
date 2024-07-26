@@ -14,8 +14,16 @@ type Config struct {
 	StoragePath string        `yaml:"storage_path" env-required:"true"`
 	TokenTTL    time.Duration `yaml:"token_ttl" env-required:"true"`
 	GRPC        GRPCConfig    `yaml:"grpc"`
+	DB          DataBase      `yaml:"database"`
 }
-
+type DataBase struct {
+	Host     string `yaml:"host"`
+	Port     string `yaml:"port"`
+	User     string `yaml:"user"`
+	Database string `yaml:"dbname"`
+	Password string `yaml:"password"`
+	SSL      string `yaml:"ssl"`
+}
 type GRPCConfig struct {
 	Port    int    `yaml:"port"`
 	Timeout string `yaml:"timeout"`

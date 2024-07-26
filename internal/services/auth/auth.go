@@ -11,7 +11,7 @@ import (
 	"log/slog"
 )
 
-type Auth struct {
+type IAuth struct {
 	log         *slog.Logger
 	usrSaver    UserSaver
 	usrProvider UserProvider
@@ -24,7 +24,7 @@ type UserSaver interface {
 }
 
 type UserProvider interface {
-	User(ctx context.Context, phone string) (models.User, error)
+	GetUserByPhone(ctx context.Context, phone string) (models.User, error)
 	IsAdmin(ctx context.Context, userId uuid.UUID) (bool, error)
 }
 
@@ -36,22 +36,22 @@ func New(
 	log *slog.Logger,
 	userSaver UserSaver,
 	userProvider UserProvider,
-) *Auth {
-	return &Auth{
+) *IAuth {
+	return &IAuth{
 		log:         log,
 		usrSaver:    userSaver,
 		usrProvider: userProvider,
 	}
 }
 
-func (a *Auth) Login(ctx context.Context, phone string, password string) (models.User, error) {
+func (a *IAuth) Login(ctx context.Context, phone string, password string) (models.User, error) {
 	const op = "auth.Login"
 	log := a.log.With(
 		slog.String("op", op),
 		slog.String("phone", phone),
 	)
 	log.Info("attempting to login")
-	user, err := a.usrProvider.User(ctx, phone)
+	user, err := a.usrProvider.GetUserByPhone(ctx, phone)
 	if err != nil {
 		if errors.Is(err, errorsUser.ErrAppNotFound) {
 			a.log.With("user not found")
@@ -61,7 +61,7 @@ func (a *Auth) Login(ctx context.Context, phone string, password string) (models
 	return user, nil
 }
 
-func (a *Auth) RegisterNewUser(ctx context.Context, phone string, email string, password string) (uuid.UUID, error) {
+func (a *IAuth) RegisterNewUser(ctx context.Context, phone string, email string, password string) (uuid.UUID, error) {
 	const op = "auth.RegisterNewUser"
 	log := a.log.With(
 		slog.String("op", op),
