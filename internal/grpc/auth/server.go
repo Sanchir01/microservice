@@ -2,7 +2,7 @@ package auth
 
 import (
 	"context"
-	sandjmav1 "github.com/Sanchir01/protos_files_job/gen/go/auth"
+	sandjmav1 "github.com/Sanchir01/protos_files_job/pkg/gen/auth"
 	"github.com/google/uuid"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
