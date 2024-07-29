@@ -13,14 +13,15 @@ type App struct {
 	GrpcSrv *grpcapp.GrpcApp
 }
 
-func NewAppSrv(log *slog.Logger, grpcPort int, cfg *config.Config) *App {
+func NewAppSrv(log *slog.Logger, cfg *config.Config) *App {
 	db := connect.PostgresMain(cfg, log)
 	storage := postgres.NewStorePostgres(db)
 	authService := auth.New(log, storage, storage)
 
-	grpcApp := grpcapp.NewServer(log, grpcPort, authService)
+	grpcApp := grpcapp.NewServer(log, cfg.GRPC.Port, authService)
 
 	return &App{
 		GrpcSrv: grpcApp,
 	}
+
 }

@@ -2,11 +2,14 @@ package postgres
 
 import (
 	"context"
+	"github.com/Sanchir01/microservice/internal/domain/models"
 	"github.com/google/uuid"
+	"golang.org/x/crypto/bcrypt"
+	"log"
 	"log/slog"
 )
 
-func (s *StorePostgres) SaveUser(ctx context.Context) (uuid.UUID, error) {
+func (s *StorePostgres) SaveUser(ctx context.Context, phone string, passHash []byte, email string) (id uuid.UUID, err error) {
 	const op = "storage.postgres.SaveUser"
 
 	conn, err := s.db.Connx(ctx)
@@ -18,10 +21,15 @@ func (s *StorePostgres) SaveUser(ctx context.Context) (uuid.UUID, error) {
 	return uuid.New(), err
 }
 
-func (s *StorePostgres) GetUserByPhone(ctx context.Context, username string) (uuid.UUID, error) {
-	return uuid.Nil, nil
+func (s *StorePostgres) GetUserByPhone(ctx context.Context, phone string) (models.User, error) {
+	password := "sadadasadad"
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	if err != nil {
+		log.Fatalf("Ошибка хэширования пароля: %v", err)
+	}
+	return models.User{ID: uuid.Nil, Email: "", PassHash: hashedPassword}, nil
 }
 
-func (s *StorePostgres) IsAdmin(ctx context.Context, username string) (bool, error) {
+func (s *StorePostgres) IsAdmin(ctx context.Context, userId uuid.UUID) (bool, error) {
 	return true, nil
 }

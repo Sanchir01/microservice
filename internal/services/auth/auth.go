@@ -11,7 +11,7 @@ import (
 	"log/slog"
 )
 
-type IAuth struct {
+type Auth struct {
 	log         *slog.Logger
 	usrSaver    UserSaver
 	usrProvider UserProvider
@@ -19,7 +19,7 @@ type IAuth struct {
 
 type UserSaver interface {
 	SaveUser(
-		ctx context.Context, phone string, passHash []byte,
+		ctx context.Context, phone string, passHash []byte, email string,
 	) (id uuid.UUID, err error)
 }
 
@@ -28,30 +28,33 @@ type UserProvider interface {
 	IsAdmin(ctx context.Context, userId uuid.UUID) (bool, error)
 }
 
-type AppProvider interface {
-	App(ctx context.Context, appId string) (models.App, error)
-}
+//type AppProvider interface {
+//	App(ctx context.Context, appId string) (models.App, error)
+//}
 
 func New(
 	log *slog.Logger,
 	userSaver UserSaver,
 	userProvider UserProvider,
-) *IAuth {
-	return &IAuth{
+) *Auth {
+	return &Auth{
 		log:         log,
 		usrSaver:    userSaver,
 		usrProvider: userProvider,
 	}
 }
 
-func (a *IAuth) Login(ctx context.Context, phone string, password string) (models.User, error) {
+func (a *Auth) Login(ctx context.Context, phone string, password string) (models.User, error) {
 	const op = "auth.Login"
 	log := a.log.With(
 		slog.String("op", op),
 		slog.String("phone", phone),
 	)
+
 	log.Info("attempting to login")
+
 	user, err := a.usrProvider.GetUserByPhone(ctx, phone)
+
 	if err != nil {
 		if errors.Is(err, errorsUser.ErrAppNotFound) {
 			a.log.With("user not found")
@@ -61,7 +64,7 @@ func (a *IAuth) Login(ctx context.Context, phone string, password string) (model
 	return user, nil
 }
 
-func (a *IAuth) RegisterNewUser(ctx context.Context, phone string, email string, password string) (uuid.UUID, error) {
+func (a *Auth) RegisterNewUser(ctx context.Context, phone string, email string, password string) (uuid.UUID, error) {
 	const op = "auth.RegisterNewUser"
 	log := a.log.With(
 		slog.String("op", op),
@@ -74,7 +77,7 @@ func (a *IAuth) RegisterNewUser(ctx context.Context, phone string, email string,
 		log.Error("failed to hash password")
 		return uuid.Nil, fmt.Errorf("%s: %w", op, err)
 	}
-	id, err := a.usrSaver.SaveUser(ctx, phone, passwordHash)
+	id, err := a.usrSaver.SaveUser(ctx, phone, passwordHash, email)
 	log.Info("user registered")
 	return id, nil
 }

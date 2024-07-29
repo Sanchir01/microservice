@@ -1,7 +1,9 @@
 env: "development"
 
 storage_path: "./config/local.yaml"
+
 token_ttl: 1h
+
 grpc:
   port: 44044
   timeout: 5s

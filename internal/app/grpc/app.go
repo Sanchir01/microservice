@@ -3,6 +3,7 @@ package grpcapp
 import (
 	"fmt"
 	authgrpc "github.com/Sanchir01/microservice/internal/grpc/auth"
+
 	"google.golang.org/grpc"
 	"log/slog"
 	"net"
@@ -15,15 +16,23 @@ type GrpcApp struct {
 	port       int
 }
 
-func NewServer(log *slog.Logger, port int, authService authgrpc.IAuth) *GrpcApp {
+func NewServer(
+	log *slog.Logger,
+	port int,
+	authService authgrpc.IAuth,
+) *GrpcApp {
 	gRPCServer := grpc.NewServer()
-	authgrpc.Register(gRPCServer, authService)
+	authgrpc.Register(
+		gRPCServer,
+		authService,
+	)
 	return &GrpcApp{
 		log: log, gRPCServer: gRPCServer, port: port,
 	}
 }
 func (g *GrpcApp) MustRun() {
 	if err := g.Run(); err != nil {
+		g.log.Error("error starting server", err)
 		panic(err)
 	}
 }
