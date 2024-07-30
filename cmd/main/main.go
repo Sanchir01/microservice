@@ -5,6 +5,7 @@ import (
 	"github.com/Sanchir01/microservice/internal/app"
 	"github.com/Sanchir01/microservice/internal/config"
 	"github.com/Sanchir01/microservice/pkg/lib/logger/handlers/slogpretty"
+	_ "github.com/lib/pq"
 	"log/slog"
 	"os"
 	"os/signal"

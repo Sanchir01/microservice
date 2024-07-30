@@ -6,6 +6,7 @@ import (
 	"github.com/google/uuid"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	"log/slog"
 
 	"google.golang.org/grpc"
 )
@@ -34,12 +35,13 @@ func (s *serverAPI) Login(ctx context.Context, req *sandjmav1.LoginRequest) (*sa
 		return nil, err
 	}
 	token, err := s.auth.Login(ctx, req.Password, req.Phone)
-
+	slog.Info("token", slog.String("token", token))
 	if err != nil {
 		return nil, err
 	}
 	return &sandjmav1.LoginResponse{
-		UserUuid: token,
+		UserUuid: req.Phone,
+		TokenTTL: req.Password,
 	}, nil
 }
 
