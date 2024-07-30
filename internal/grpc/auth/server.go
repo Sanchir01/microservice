@@ -3,33 +3,29 @@ package authgrpc
 import (
 	"context"
 	sandjmav1 "github.com/Sanchir01/protos_files_job/pkg/gen/auth"
+	"github.com/google/uuid"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
 	"google.golang.org/grpc"
 )
 
-type IAuth interface {
+type Auth interface {
 	Login(
 		ctx context.Context,
-		email string,
+		phone string,
 		password string,
-		appID int,
-	) (token string, err error)
-	RegisterNewUser(
-		ctx context.Context,
-		email string,
-		password string,
-	) (userID string, err error)
-	IsAdmin(ctx context.Context, userID int64) (bool, error)
+	) (string, error)
+	RegisterNewUser(ctx context.Context, phone string, email string, password string) (uuid.UUID, error)
+	IsAdmin(ctx context.Context, userID uuid.UUID) (bool, error)
 }
 
 type serverAPI struct {
 	sandjmav1.UnimplementedAuthServer
-	auth IAuth
+	auth Auth
 }
 
-func Register(gRPC *grpc.Server, auth IAuth) {
+func Register(gRPC *grpc.Server, auth Auth) {
 	sandjmav1.RegisterAuthServer(gRPC, &serverAPI{auth: auth})
 }
 
@@ -37,7 +33,7 @@ func (s *serverAPI) Login(ctx context.Context, req *sandjmav1.LoginRequest) (*sa
 	if err := validateLogin(req); err != nil {
 		return nil, err
 	}
-	token, err := s.auth.Login(ctx, req.Password, req.Phone, 1)
+	token, err := s.auth.Login(ctx, req.Password, req.Phone)
 
 	if err != nil {
 		return nil, err
@@ -51,11 +47,11 @@ func (s *serverAPI) Register(ctx context.Context, req *sandjmav1.RegisterRequest
 	if err := validateRegister(req); err != nil {
 		return nil, err
 	}
-	userId, err := s.auth.RegisterNewUser(ctx, req.GetPhone(), req.GetPassword())
+	userId, err := s.auth.RegisterNewUser(ctx, req.GetPhone(), req.GetPassword(), req.Email)
 	if err != nil {
 		return nil, status.Error(codes.InvalidArgument, "user is required")
 	}
-	return &sandjmav1.RegisterResponse{UserUuid: userId}, nil
+	return &sandjmav1.RegisterResponse{UserUuid: userId.String()}, nil
 }
 
 func validateLogin(req *sandjmav1.LoginRequest) error {

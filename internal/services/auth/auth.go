@@ -44,11 +44,12 @@ func New(
 	}
 }
 
-func (a *Auth) Login(ctx context.Context, phone string, password string) (models.User, error) {
+func (a *Auth) Login(ctx context.Context, phone string, password string) (string, error) {
 	const op = "auth.Login"
 	log := a.log.With(
 		slog.String("op", op),
 		slog.String("phone", phone),
+		slog.String("password", password),
 	)
 
 	log.Info("attempting to login")
@@ -58,10 +59,10 @@ func (a *Auth) Login(ctx context.Context, phone string, password string) (models
 	if err != nil {
 		if errors.Is(err, errorsUser.ErrAppNotFound) {
 			a.log.With("user not found")
-			return models.User{}, fmt.Errorf("%s: %w", op, err)
+			return "", fmt.Errorf("%s: %w", op, err)
 		}
 	}
-	return user, nil
+	return user.Email, nil
 }
 
 func (a *Auth) RegisterNewUser(ctx context.Context, phone string, email string, password string) (uuid.UUID, error) {
@@ -80,4 +81,8 @@ func (a *Auth) RegisterNewUser(ctx context.Context, phone string, email string, 
 	id, err := a.usrSaver.SaveUser(ctx, phone, passwordHash, email)
 	log.Info("user registered")
 	return id, nil
+}
+
+func (a *Auth) IsAdmin(ctx context.Context, userId uuid.UUID) (bool, error) {
+	return true, nil
 }

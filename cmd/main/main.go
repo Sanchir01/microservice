@@ -23,7 +23,7 @@ func main() {
 
 	lg := setupLogger(cfg.Env)
 
-	application := app.NewAppSrv(lg, cfg.GRPC.Port, cfg)
+	application := app.NewAppSrv(lg, cfg)
 
 	go func() { application.GrpcSrv.MustRun() }()
 
