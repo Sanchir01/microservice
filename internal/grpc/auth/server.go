@@ -2,7 +2,7 @@ package authgrpc
 
 import (
 	"context"
-	sandjmav1 "github.com/Sanchir01/protos_files_job/pkg/gen/auth"
+	sandjmav1 "github.com/Sanchir01/protos_files_job/pkg/gen/golang/auth"
 	"github.com/google/uuid"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -21,16 +21,16 @@ type Auth interface {
 	IsAdmin(ctx context.Context, userID uuid.UUID) (bool, error)
 }
 
-type serverAPI struct {
+type serverAuthAPI struct {
 	sandjmav1.UnimplementedAuthServer
 	auth Auth
 }
 
 func Register(gRPC *grpc.Server, auth Auth) {
-	sandjmav1.RegisterAuthServer(gRPC, &serverAPI{auth: auth})
+	sandjmav1.RegisterAuthServer(gRPC, &serverAuthAPI{auth: auth})
 }
 
-func (s *serverAPI) Login(ctx context.Context, req *sandjmav1.LoginRequest) (*sandjmav1.LoginResponse, error) {
+func (s *serverAuthAPI) Login(ctx context.Context, req *sandjmav1.LoginRequest) (*sandjmav1.LoginResponse, error) {
 	if err := validateLogin(req); err != nil {
 		return nil, err
 	}
@@ -45,7 +45,7 @@ func (s *serverAPI) Login(ctx context.Context, req *sandjmav1.LoginRequest) (*sa
 	}, nil
 }
 
-func (s *serverAPI) Register(ctx context.Context, req *sandjmav1.RegisterRequest) (*sandjmav1.RegisterResponse, error) {
+func (s *serverAuthAPI) Register(ctx context.Context, req *sandjmav1.RegisterRequest) (*sandjmav1.RegisterResponse, error) {
 	if err := validateRegister(req); err != nil {
 		return nil, err
 	}
